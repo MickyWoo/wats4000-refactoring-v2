@@ -9,37 +9,24 @@
     <ul v-if="weatherData && errors.length===0" class="forecast">
       <li v-for="(forecast,index) in weatherData.list" :key="index">
         <h3>{{ forecast.dt|formatDate }}</h3>
-        <!-- TODO: Make weather summary be in a child component. -->
-        <div v-for="(weatherSummary,index) in forecast.weather" :key="index" class="weatherSummary">
-            <img v-bind:src="'http://openweathermap.org/img/w/' + weatherSummary.icon + '.png'" v-bind:alt="weatherSummary.main">
-            <br>
-            <b>{{ weatherSummary.main }}</b>
-        </div>
-        <!-- TODO: Make dl of weather data be in a child component. -->
-        <dl>
-            <dt>Humidity</dt>
-            <dd>{{ forecast.main.humidity }}%</dd>
-            <dt>High</dt>
-            <dd>{{ forecast.main.temp_max }}&deg;F</dd>
-            <dt>Low</dt>
-            <dd>{{ forecast.main.temp_min }}&deg;F</dd>
-        </dl>
+
+       <weather-Summary v-bind:weatherData="forecast.weather"> </weather-Summary>
+       <weather-Conditions v-bind:Conditions="forecast.main"> </weather-Conditions>
       </li>
     </ul>
-    <div v-else-if="errors.length > 0">
-      <h2>There was an error fetching weather data.</h2>
-      <ul class="errors">
-        <li v-for="(error,index) in errors" :key="index">{{ error }}</li>
-      </ul>
-    </div>
+
     <div v-else>
       <h2>Loading...</h2>
     </div>
+     <errorList v-bind:ErrorList="errors"> </errorList>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+import {API} from '@/common/api.js';
+import weatherSummary from '@/views/weatherSummary.vue'
+import weatherConditions from '@/views/weatherConditions.vue'
+import ErrorList from '@/views/ErrorList.vue'
 
 export default {
   name: 'Forecast',
@@ -51,12 +38,12 @@ export default {
     }
   },
   created () {
-    // TODO: Improve base config for API
-    axios.get('//api.openweathermap.org/data/2.5/forecast', {
+
+    API.get('forecast', {
       params: {
           id: this.$route.params.cityId,
-          units: 'imperial',
-          APPID: 'YOUR_APPID_HERE'
+
+
       }
     })
     .then(response => {
@@ -70,8 +57,8 @@ export default {
     formatDate: function (timestamp){
       let date = new Date(timestamp * 1000);
       const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-      // const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-      //let weekday = date.getDay();
+     //const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+     // let weekday = date.getDay();
       let daynum = date.getDate();
       let month = date.getMonth();
 
@@ -88,6 +75,11 @@ export default {
       //let year = date.getFullYear();
       return `${ months[month] } ${ daynum } @ ${ hour }`;
     }
+  },
+  components: {
+    'weather-Summary': weatherSummary,
+    'weather-Conditions': weatherConditions,
+    'errorList': ErrorList
   }
 }
 </script>

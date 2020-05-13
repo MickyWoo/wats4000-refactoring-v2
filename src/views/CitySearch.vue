@@ -2,72 +2,76 @@
   <div>
     <h2>City Search</h2>
     <form v-on:submit.prevent="getCities">
-        <p>Enter city name: <input type="text" v-model="query" placeholder="Paris"> <button type="submit">Go</button></p>
+      <p>Enter city name: <input
+          type="text"
+          v-model="query"
+          placeholder="Paris"
+        > <button type="submit">Go</button></p>
     </form>
-    <ul class="cities" v-if="results && results.list.length > 0">
-        <li v-for="(city,index) in results.list" :key="index">
-            <h2>{{ city.name }}, {{ city.sys.country }}</h2>
-            <p><router-link v-bind:to="{ name: 'CurrentWeather', params: { cityId: city.id } }">View Current Weather</router-link></p>
+    <ul
+      class="cities"
+      v-if="results && results.list.length > 0"
+    >
+      <li
+        v-for="(city,index) in results.list"
+        :key="index"
+      >
+        <h2>{{ city.name }}, {{ city.sys.country }}</h2>
+        <p>
+          <router-link v-bind:to="{ name: 'CurrentWeather', params: { cityId: city.id } }">View Current Weather</router-link>
+        </p>
 
-            <!-- TODO: Make weather summary be in a child component. -->
-            <div v-for="(weatherSummary,index) in city.weather" class="weatherSummary" :key="index">
-                <img v-bind:src="'http://openweathermap.org/img/w/' + weatherSummary.icon + '.png'" v-bind:alt="weatherSummary.main">
-                <br>
-                <b>{{ weatherSummary.main }}</b>
-            </div>
-            <!-- TODO: Make dl of weather data be in a child component. -->
-            <dl>
-                <dt>Current Temp</dt>
-                <dd>{{ city.main.temp }}&deg;F</dd>
-                <dt>Humidity</dt>
-                <dd>{{ city.main.humidity }}%</dd>
-                <dt>High</dt>
-                <dd>{{ city.main.temp_max }}&deg;F</dd>
-                <dt>Low</dt>
-                <dd>{{ city.main.temp_min }}&deg;F</dd>
-            </dl>
-        </li>
+        <weather-Summary v-bind:weatherData="city.weather"> </weather-Summary>
+
+        <!-- the parameters are in kept within the -component- "weather-summary" which then v-bind weatherData from v-for in weatherSummary.vue
+          and then set it equal to  "___.weather" in this case city because convention of location, we are in <ul>  and v-for (city,index) exclude index because its key-->
+
+        <weather-Conditions v-bind:conditions="city.main"> </weather-Conditions>
+        <!-- the conditions comes from weatherConditions.vue via conditions.___ and then city.main is what the original DL city.main.humidity was using before changing into a child
+          so it needs to inject itself again from the child into this vue parent -->
+
+      </li>
     </ul>
-    <div v-else-if="errors.length > 0">
-      <h2>There was an error fetching weather data.</h2>
-      <ul class="errors">
-        <li v-for="(error,index) in errors" :key="index">{{ error }}</li>
-      </ul>
-    </div>
+    <errorList v-bind:ErrorList="errors"> </errorList>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+import { API } from "@/common/api.js";
+import weatherSummary from "@/views/weatherSummary.vue";
+import weatherConditions from "@/views/weatherConditions.vue";
+import ErrorList from "@/views/ErrorList.vue";
 
 export default {
-  name: 'CitySearch',
-  data () {
+  name: "CitySearch",
+  data() {
     return {
       results: null,
       errors: [],
-      query: ''
-    }
+      query: ""
+    };
   },
   methods: {
-    getCities: function () {
-      // TODO: Improve base config for API
-      axios.get('//api.openweathermap.org/data/2.5/find', {
+    getCities: function() {
+      API.get("find", {
         params: {
-            q: this.query,
-            units: 'imperial',
-            APPID: 'YOUR_APPID_HERE'
+          q: this.query
         }
       })
-      .then(response => {
-        this.results = response.data
-      })
-      .catch(error => {
-        this.errors.push(error)
-      });
+        .then(response => {
+          this.results = response.data;
+        })
+        .catch(error => {
+          this.errors.push(error);
+        });
     }
+  },
+  components: {
+    'weather-Summary': weatherSummary,
+    'weather-Conditions': weatherConditions,
+    'errorList': ErrorList
   }
-}
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -77,7 +81,8 @@ export default {
   border: solid red 1px;
   padding: 5px;
 }
-h1, h2 {
+h1,
+h2 {
   font-weight: normal;
 }
 
