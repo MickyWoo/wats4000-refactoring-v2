@@ -23,12 +23,7 @@
 
         <weather-Summary v-bind:weatherData="city.weather"> </weather-Summary>
 
-        <!-- the parameters are in kept within the -component- "weather-summary" which then v-bind weatherData from v-for in weatherSummary.vue
-          and then set it equal to  "___.weather" in this case city because convention of location, we are in <ul>  and v-for (city,index) exclude index because its key-->
-
         <weather-Conditions v-bind:conditions="city.main"> </weather-Conditions>
-        <!-- the conditions comes from weatherConditions.vue via conditions.___ and then city.main is what the original DL city.main.humidity was using before changing into a child
-          so it needs to inject itself again from the child into this vue parent -->
 
       </li>
     </ul>
@@ -67,9 +62,9 @@ export default {
     }
   },
   components: {
-    'weather-Summary': weatherSummary,
-    'weather-Conditions': weatherConditions,
-    'errorList': ErrorList
+    "weather-Summary": weatherSummary,
+    "weather-Conditions": weatherConditions,
+    errorList: ErrorList
   }
 };
 </script>
