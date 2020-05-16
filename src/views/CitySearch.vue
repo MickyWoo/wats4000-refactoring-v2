@@ -62,9 +62,9 @@ export default {
     }
   },
   components: {
-    "weather-Summary": weatherSummary,
-    "weather-Conditions": weatherConditions,
-    errorList: ErrorList
+   'weather-Summary': weatherSummary,
+    'weather-Conditions': weatherConditions,
+    'errorList': ErrorList
   }
 };
 </script>
