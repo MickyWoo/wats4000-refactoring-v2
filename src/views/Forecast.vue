@@ -11,7 +11,7 @@
         <h3>{{ forecast.dt|formatDate }}</h3>
 
        <weather-Summary v-bind:weatherData="forecast.weather"> </weather-Summary>
-       <weather-Conditions v-bind:Conditions="forecast.main"> </weather-Conditions>
+       <weather-Conditions v-bind:conditions="forecast.main"> </weather-Conditions>
       </li>
     </ul>
 
